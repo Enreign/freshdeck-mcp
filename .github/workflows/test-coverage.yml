@@ -1,0 +1,126 @@
+name: Test Coverage
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Run type checking
+      run: npm run typecheck
+
+    - name: Run unit tests with coverage
+      run: npm run test:unit
+
+    - name: Run integration tests with coverage
+      run: npm run test:integration
+
+    - name: Run security tests with coverage
+      run: npm run test:security
+
+    - name: Run end-to-end tests with coverage
+      run: npm run test:e2e
+
+    - name: Run all tests with coverage
+      run: npm run test:coverage
+
+    - name: Check coverage thresholds
+      run: npm run test:coverage:threshold
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+
+    - name: Upload coverage to Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./coverage/lcov.info
+
+    - name: Archive test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: |
+          coverage/
+          jest-results.xml
+
+    - name: Archive coverage reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report-${{ matrix.node-version }}
+        path: coverage/
+
+  coverage-comment:
+    runs-on: ubuntu-latest
+    needs: test-coverage
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Download coverage reports
+      uses: actions/download-artifact@v3
+      with:
+        name: coverage-report-20.x
+
+    - name: Comment coverage on PR
+      uses: romeovs/lcov-reporter-action@v0.3.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ./coverage/lcov.info
+        delete-old-comments: true
+
+  coverage-badge:
+    runs-on: ubuntu-latest
+    needs: test-coverage
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Download coverage reports
+      uses: actions/download-artifact@v3
+      with:
+        name: coverage-report-20.x
+
+    - name: Extract coverage percentage
+      id: coverage
+      run: |
+        COVERAGE=$(grep -o 'lines.*[0-9]\+\.[0-9]\+%' coverage/lcov-report/index.html | grep -o '[0-9]\+\.[0-9]\+' | head -1)
+        echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
+
+    - name: Create coverage badge
+      uses: schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: your-gist-id-here
+        filename: freshdesk-mcp-coverage.json
+        label: coverage
+        message: ${{ steps.coverage.outputs.percentage }}%
+        color: ${{ steps.coverage.outputs.percentage > 95 && 'brightgreen' || steps.coverage.outputs.percentage > 90 && 'green' || steps.coverage.outputs.percentage > 80 && 'yellow' || 'red' }}
