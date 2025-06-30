@@ -150,3 +150,29 @@ export function isRetryableError(error: FreshdeskError): boolean {
   if (error.statusCode && error.statusCode >= 500) return true;
   return false;
 }
+
+export class ServerError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ServerError';
+  }
+}
+
+export class ProtocolError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ProtocolError';
+  }
+}
+
+export class ToolExecutionError extends Error {
+  public readonly toolName: string;
+  public readonly originalError?: Error;
+
+  constructor(message: string, toolName: string, originalError?: Error) {
+    super(message);
+    this.name = 'ToolExecutionError';
+    this.toolName = toolName;
+    this.originalError = originalError;
+  }
+}

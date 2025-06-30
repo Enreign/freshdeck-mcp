@@ -10,6 +10,7 @@ A Model Context Protocol (MCP) server implementation for Freshdesk API v2 integr
 - **Error Handling**: Comprehensive error handling with retry logic
 - **Type Safety**: Full TypeScript implementation with strict typing
 - **Logging**: Structured logging with Pino
+- **Enhanced Server Option**: Advanced server with permission discovery and tool management (see [ENHANCED_SERVER.md](ENHANCED_SERVER.md))
 
 ## Installation
 

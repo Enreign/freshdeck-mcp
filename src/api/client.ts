@@ -4,6 +4,7 @@ import { Authenticator } from '../auth/authenticator.js';
 import { RateLimiter } from '../utils/rateLimiter.js';
 import { parseAxiosError, isRetryableError, FreshdeskError } from '../utils/errors.js';
 import { createLogger } from '../utils/logger.js';
+import { TicketsAPI, ContactsAPI, AgentsAPI, CompaniesAPI, ConversationsAPI } from './resources/index.js';
 
 const logger = createLogger('api-client');
 
@@ -12,6 +13,13 @@ export class FreshdeskClient {
   private authenticator: Authenticator;
   private rateLimiter: RateLimiter;
   private config: FreshdeskConfig;
+
+  // Resource APIs
+  public tickets: TicketsAPI;
+  public contacts: ContactsAPI;
+  public agents: AgentsAPI;
+  public companies: CompaniesAPI;
+  public conversations: ConversationsAPI;
 
   constructor(config: FreshdeskConfig) {
     this.config = config;
@@ -69,6 +77,35 @@ export class FreshdeskClient {
         return Promise.reject(error);
       }
     );
+
+    // Initialize resource APIs
+    this.tickets = new TicketsAPI(this);
+    this.contacts = new ContactsAPI(this);
+    this.agents = new AgentsAPI(this);
+    this.companies = new CompaniesAPI(this);
+    this.conversations = new ConversationsAPI(this);
+  }
+
+  public async makeRequest<T>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+    path: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    switch (method) {
+      case 'GET':
+        return this.get<T>(path, config);
+      case 'POST':
+        return this.post<T>(path, data, config);
+      case 'PUT':
+        return this.put<T>(path, data, config);
+      case 'DELETE':
+        return this.delete<T>(path, config);
+      case 'PATCH':
+        return this.patch<T>(path, data, config);
+      default:
+        throw new Error(`Unsupported method: ${method}`);
+    }
   }
 
   private async executeWithRetry<T>(
