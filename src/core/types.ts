@@ -172,3 +172,128 @@ export interface Avatar {
   created_at: string;
   updated_at: string;
 }
+
+// Create/Update data types
+export interface TicketCreateData {
+  subject: string;
+  description: string;
+  email: string;
+  priority: Priority;
+  status: Status;
+  source?: Source;
+  tags?: string[];
+  cc_emails?: string[];
+  custom_fields?: Record<string, any>;
+  group_id?: number;
+  responder_id?: number;
+  type?: string;
+  product_id?: number;
+}
+
+export interface TicketUpdateData {
+  subject?: string;
+  description?: string;
+  priority?: Priority;
+  status?: Status;
+  tags?: string[];
+  custom_fields?: Record<string, any>;
+  group_id?: number;
+  responder_id?: number;
+  type?: string;
+  product_id?: number;
+}
+
+export interface ContactCreateData {
+  name: string;
+  email: string;
+  phone?: string;
+  mobile?: string;
+  twitter_id?: string;
+  unique_external_id?: string;
+  other_emails?: string[];
+  company_id?: number;
+  view_all_tickets?: boolean;
+  language?: string;
+  time_zone?: string;
+  tags?: string[];
+  custom_fields?: Record<string, any>;
+  address?: string;
+}
+
+export interface ContactUpdateData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  mobile?: string;
+  twitter_id?: string;
+  unique_external_id?: string;
+  other_emails?: string[];
+  company_id?: number;
+  view_all_tickets?: boolean;
+  language?: string;
+  time_zone?: string;
+  tags?: string[];
+  custom_fields?: Record<string, any>;
+  address?: string;
+}
+
+export interface AgentUpdateData {
+  occasional?: boolean;
+  signature?: string;
+  ticket_scope?: number;
+  group_ids?: number[];
+  role_ids?: number[];
+  contact?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    mobile?: string;
+    job_title?: string;
+    language?: string;
+    time_zone?: string;
+  };
+}
+
+export interface CompanyCreateData {
+  name: string;
+  domains?: string[];
+  description?: string;
+  note?: string;
+  health_score?: string;
+  account_tier?: string;
+  renewal_date?: string;
+  industry?: string;
+  custom_fields?: Record<string, any>;
+}
+
+export interface CompanyUpdateData {
+  name?: string;
+  domains?: string[];
+  description?: string;
+  note?: string;
+  health_score?: string;
+  account_tier?: string;
+  renewal_date?: string;
+  industry?: string;
+  custom_fields?: Record<string, any>;
+}
+
+export interface ConversationReplyData {
+  body: string;
+  from_email?: string;
+  to_emails?: string[];
+  cc_emails?: string[];
+  bcc_emails?: string[];
+  attachments?: any[];
+}
+
+export interface ConversationNoteData {
+  body: string;
+  private?: boolean;
+  notify_emails?: string[];
+  attachments?: any[];
+}
+
+export interface ConversationUpdateData {
+  body: string;
+}
