@@ -55,10 +55,10 @@ export class EnhancedFreshdeskServer {
   private logger;
   private startTime: Date;
   private metrics: ServerMetrics;
-  private config: FreshdeskConfig;
+  // private _config: FreshdeskConfig;
 
   constructor(config: FreshdeskConfig) {
-    this.config = config;
+    // this._config = config;
     this.logger = createLogger('mcp-server');
     this.client = new FreshdeskClient(config);
     this.toolRegistry = new ToolRegistry();
