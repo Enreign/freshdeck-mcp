@@ -1,16 +1,18 @@
 # Freshdesk MCP Server
 
+[![CI](https://github.com/Enreign/freshdeck-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Enreign/freshdeck-mcp/actions/workflows/ci.yml)
+
 A Model Context Protocol (MCP) server implementation for Freshdesk API v2 integration. This server provides tools for managing tickets, contacts, agents, companies, and conversations through the MCP interface.
 
 ## Features
 
 - **Complete Freshdesk API v2 Integration**: Full support for core Freshdesk resources
-- **Built-in Authentication**: Secure API key-based authentication
+- **Built-in Authentication**: Secure API key-based authentication with input validation
 - **Rate Limiting**: Automatic rate limit handling with configurable limits
-- **Error Handling**: Comprehensive error handling with retry logic
+- **Error Handling**: Comprehensive error handling with retry logic and exponential backoff
 - **Type Safety**: Full TypeScript implementation with strict typing
 - **Logging**: Structured logging with Pino
-- **Enhanced Server Option**: Advanced server with permission discovery and tool management (see [ENHANCED_SERVER.md](ENHANCED_SERVER.md))
+- **Security**: Input validation, injection prevention, and authentication security tests
 
 ## Installation
 
