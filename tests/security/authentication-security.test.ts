@@ -58,10 +58,10 @@ describe('Security - Authentication and Authorization Tests', () => {
       const headers = auth.getAuthHeader();
       
       // Should have Authorization header
-      expect(headers.Authorization).toBeDefined();
+      expect(headers['Authorization']).toBeDefined();
       
       // Should be base64 encoded
-      const decoded = Buffer.from(headers.Authorization.split(' ')[1], 'base64').toString();
+      const decoded = Buffer.from(headers['Authorization']!.split(' ')[1]!, 'base64').toString();
       expect(decoded).toContain('very-secret-api-key-12345:');
     });
 
@@ -83,10 +83,10 @@ describe('Security - Authentication and Authorization Tests', () => {
       const newHeader = newAuth.getAuthHeader();
       
       // Headers should be different
-      expect(originalHeader.Authorization).not.toBe(newHeader.Authorization);
-      
+      expect(originalHeader['Authorization']).not.toBe(newHeader['Authorization']);
+
       // New header should contain new key
-      const decoded = Buffer.from(newHeader.Authorization.split(' ')[1], 'base64').toString();
+      const decoded = Buffer.from(newHeader['Authorization']!.split(' ')[1]!, 'base64').toString();
       expect(decoded).toContain(newKey);
       expect(decoded).not.toContain(originalKey);
     });
@@ -212,8 +212,8 @@ describe('Security - Authentication and Authorization Tests', () => {
 
       // Should not contain injected headers
       expect(headers).not.toHaveProperty('X-Injected-Header');
-      expect(headers.Authorization).not.toContain('\r\n');
-      expect(headers.Authorization).not.toContain('X-Injected-Header');
+      expect(headers['Authorization']).not.toContain('\r\n');
+      expect(headers['Authorization']).not.toContain('X-Injected-Header');
     });
   });
 
@@ -229,14 +229,14 @@ describe('Security - Authentication and Authorization Tests', () => {
 
       // Headers should be created fresh each time
       expect(headers).toBeDefined();
-      expect(headers.Authorization).toBeDefined();
+      expect(headers['Authorization']).toBeDefined();
 
       // Modifying config should not affect already created headers
       config.apiKey = 'modified-key';
       const newAuth = new Authenticator(config);
       const newHeaders = newAuth.getAuthHeader();
 
-      expect(headers.Authorization).not.toBe(newHeaders.Authorization);
+      expect(headers['Authorization']).not.toBe(newHeaders['Authorization']);
     });
 
     it('should handle concurrent authentication requests safely', async () => {
@@ -252,7 +252,7 @@ describe('Security - Authentication and Authorization Tests', () => {
 
       const results = await Promise.all(promises);
       
-      results.forEach((result, index) => {
+      results.forEach((result: any, index) => {
         expect(result.id).toBe(index);
       });
     });
@@ -458,7 +458,7 @@ describe('Security - Authentication and Authorization Tests', () => {
       }
 
       // Headers should still be valid
-      expect(headers.Authorization).toBeDefined();
+      expect(headers['Authorization']).toBeDefined();
     });
   });
 });
