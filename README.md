@@ -1,6 +1,6 @@
 # Freshdesk MCP Server
 
-[![CI](https://github.com/Enreign/freshdeck-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Enreign/freshdeck-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/Enreign/freshdeck-mcp/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/Enreign/freshdeck-mcp/actions/workflows/test-coverage.yml)
 
 A Model Context Protocol (MCP) server implementation for Freshdesk API v2 integration. This server provides tools for managing tickets, contacts, agents, companies, and conversations through the MCP interface.
 
