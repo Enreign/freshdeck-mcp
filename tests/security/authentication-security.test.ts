@@ -9,6 +9,8 @@ describe('Security - Authentication and Authorization Tests', () => {
   const baseUrl = 'https://test-domain.freshdesk.com/api/v2';
 
   beforeEach(() => {
+    jest.useRealTimers();
+    nock.cleanAll();
     const config: FreshdeskConfig = {
       domain: 'test-domain',
       apiKey: 'test-api-key',
