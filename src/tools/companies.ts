@@ -42,9 +42,8 @@ const DeleteCompanySchema = z.object({
 });
 
 const SearchCompaniesSchema = z.object({
-  query: z.string().describe('Search query string'),
+  query: z.string().describe('Search query. Valid field: domain (e.g. "domain:\'freshdesk.com\'")'),
   page: z.number().min(1).optional().describe('Page number (default: 1)'),
-  per_page: z.number().min(1).max(100).optional().describe('Items per page (default: 30, max: 100)'),
 });
 
 const ListCompanyContactsSchema = z.object({
@@ -166,11 +165,10 @@ export class CompaniesTool extends BaseTool {
 
   private async searchCompanies(params: any): Promise<string> {
     const validated = SearchCompaniesSchema.parse(params);
-    
+
     const queryParams = {
-      query: validated.query,
+      query: `"${validated.query}"`,
       page: validated.page || 1,
-      per_page: validated.per_page || 30,
     };
 
     const response = await this.client.get<{ results: Company[]; total: number }>('/search/companies', { params: queryParams });
@@ -179,19 +177,19 @@ export class CompaniesTool extends BaseTool {
       companies: response.results,
       total: response.total,
       page: queryParams.page,
-      per_page: queryParams.per_page,
     });
   }
 
   private async listCompanyContacts(params: any): Promise<string> {
     const validated = ListCompanyContactsSchema.parse(params);
-    
+
     const queryParams = {
+      company_id: validated.company_id,
       page: validated.page || 1,
       per_page: validated.per_page || 30,
     };
 
-    const contacts = await this.client.get<any[]>(`/companies/${validated.company_id}/contacts`, { params: queryParams });
+    const contacts = await this.client.get<any[]>('/contacts', { params: queryParams });
     return this.formatResponse({
       success: true,
       company_id: validated.company_id,

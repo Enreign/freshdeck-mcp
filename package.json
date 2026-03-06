@@ -18,7 +18,7 @@
     "test:coverage:threshold": "jest --coverage --coverageThreshold='{}' --passWithNoTests",
     "test:unit": "jest tests/unit tests/api tests/auth tests/core tests/tools tests/utils --coverage",
     "test:integration": "jest tests/integration --coverage",
-    "test:e2e": "jest tests/e2e --coverage",
+    "test:e2e": "tsx tests/e2e/freshdesk-tools.e2e.test.ts",
     "test:security": "jest tests/security --coverage",
     "test:mcp:all": "jest --config jest.config.mcp.js tests/mcp --coverage",
     "test:mcp:process": "jest --config jest.config.mcp.js tests/mcp/real-process.test.ts",

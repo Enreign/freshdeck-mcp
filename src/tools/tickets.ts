@@ -54,9 +54,8 @@ const DeleteTicketSchema = z.object({
 });
 
 const SearchTicketsSchema = z.object({
-  query: z.string().describe('Search query string (e.g., "status:2 priority:1")'),
+  query: z.string().describe('Search query. Valid fields: status (2=Open,3=Pending,4=Resolved,5=Closed), priority (1=Low,2=Medium,3=High,4=Urgent), type, tag, agent_id, group_id, company_id, due_by, created_at, updated_at. Example: "status:2 AND priority:1"'),
   page: z.number().min(1).optional().describe('Page number (default: 1)'),
-  per_page: z.number().min(1).max(100).optional().describe('Items per page (default: 30, max: 100)'),
 });
 
 export class TicketsTool extends BaseTool {
@@ -210,11 +209,10 @@ export class TicketsTool extends BaseTool {
 
   private async searchTickets(params: any): Promise<string> {
     const validated = SearchTicketsSchema.parse(params);
-    
+
     const queryParams = {
-      query: validated.query,
+      query: `"${validated.query}"`,
       page: validated.page || 1,
-      per_page: validated.per_page || 30,
     };
 
     const response = await this.client.get<{ results: Ticket[]; total: number }>('/search/tickets', { params: queryParams });
@@ -223,7 +221,6 @@ export class TicketsTool extends BaseTool {
       tickets: response.results,
       total: response.total,
       page: queryParams.page,
-      per_page: queryParams.per_page,
     });
   }
 }
