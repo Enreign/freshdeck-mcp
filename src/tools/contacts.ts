@@ -205,11 +205,10 @@ export class ContactsTool extends BaseTool {
 
   private async searchContacts(params: any): Promise<string> {
     const validated = SearchContactsSchema.parse(params);
-    
+
     const queryParams = {
-      query: validated.query,
+      query: `"${validated.query}"`,
       page: validated.page || 1,
-      per_page: validated.per_page || 30,
     };
 
     const response = await this.client.get<{ results: Contact[]; total: number }>('/search/contacts', { params: queryParams });
@@ -218,14 +217,14 @@ export class ContactsTool extends BaseTool {
       contacts: response.results,
       total: response.total,
       page: queryParams.page,
-      per_page: queryParams.per_page,
     });
   }
 
   private async mergeContacts(params: any): Promise<string> {
     const validated = MergeContactsSchema.parse(params);
     
-    const contact = await this.client.put<Contact>(`/contacts/${validated.primary_contact_id}/merge`, {
+    const contact = await this.client.post<Contact>('/contacts/merge', {
+      primary_contact_id: validated.primary_contact_id,
       secondary_contact_ids: validated.secondary_contact_ids,
     });
 
