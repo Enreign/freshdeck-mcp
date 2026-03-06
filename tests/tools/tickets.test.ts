@@ -513,9 +513,8 @@ describe('TicketsTool', () => {
 
       expect(mockClient.get).toHaveBeenCalledWith('/search/tickets', {
         params: {
-          query: 'status:2 priority:1',
+          query: '"status:2 priority:1"',
           page: 1,
-          per_page: 30,
         },
       });
 
@@ -523,7 +522,6 @@ describe('TicketsTool', () => {
       expect(parsed.tickets).toEqual(mockSearchResponse.results);
       expect(parsed.total).toBe(2);
       expect(parsed.page).toBe(1);
-      expect(parsed.per_page).toBe(30);
     });
 
     it('should search tickets with pagination', async () => {
@@ -539,9 +537,8 @@ describe('TicketsTool', () => {
 
       expect(mockClient.get).toHaveBeenCalledWith('/search/tickets', {
         params: {
-          query: 'urgent tickets',
+          query: '"urgent tickets"',
           page: 3,
-          per_page: 10,
         },
       });
     });

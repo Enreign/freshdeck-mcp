@@ -344,7 +344,11 @@ describe('AgentsTool', () => {
     ];
 
     it('should get agent groups', async () => {
-      mockClient.get.mockResolvedValue(mockGroups);
+      const mockAgentWithGroups = { id: 123, group_ids: [1, 2] };
+      mockClient.get
+        .mockResolvedValueOnce(mockAgentWithGroups)
+        .mockResolvedValueOnce(mockGroups[0])
+        .mockResolvedValueOnce(mockGroups[1]);
 
       const params = {
         agent_id: 123,
@@ -353,7 +357,9 @@ describe('AgentsTool', () => {
       const result = await agentsTool['listAgentGroups'](params);
       const parsed = JSON.parse(result);
 
-      expect(mockClient.get).toHaveBeenCalledWith('/agents/123/groups');
+      expect(mockClient.get).toHaveBeenCalledWith('/agents/123');
+      expect(mockClient.get).toHaveBeenCalledWith('/groups/1');
+      expect(mockClient.get).toHaveBeenCalledWith('/groups/2');
 
       expect(parsed.success).toBe(true);
       expect(parsed.groups).toEqual(mockGroups);
@@ -374,7 +380,11 @@ describe('AgentsTool', () => {
     ];
 
     it('should get agent roles', async () => {
-      mockClient.get.mockResolvedValue(mockRoles);
+      const mockAgentWithRoles = { id: 123, role_ids: [10, 20] };
+      mockClient.get
+        .mockResolvedValueOnce(mockAgentWithRoles)
+        .mockResolvedValueOnce(mockRoles[0])
+        .mockResolvedValueOnce(mockRoles[1]);
 
       const params = {
         agent_id: 123,
@@ -383,7 +393,9 @@ describe('AgentsTool', () => {
       const result = await agentsTool['listAgentRoles'](params);
       const parsed = JSON.parse(result);
 
-      expect(mockClient.get).toHaveBeenCalledWith('/agents/123/roles');
+      expect(mockClient.get).toHaveBeenCalledWith('/agents/123');
+      expect(mockClient.get).toHaveBeenCalledWith('/roles/10');
+      expect(mockClient.get).toHaveBeenCalledWith('/roles/20');
 
       expect(parsed.success).toBe(true);
       expect(parsed.roles).toEqual(mockRoles);
@@ -459,7 +471,8 @@ describe('AgentsTool', () => {
     });
 
     it('should handle empty groups and roles', async () => {
-      mockClient.get.mockResolvedValue([]);
+      const mockAgentNoGroupsRoles = { id: 123, group_ids: [], role_ids: [] };
+      mockClient.get.mockResolvedValue(mockAgentNoGroupsRoles);
 
       const groupsResult = await agentsTool['listAgentGroups']({ agent_id: 123 });
       const rolesResult = await agentsTool['listAgentRoles']({ agent_id: 123 });
