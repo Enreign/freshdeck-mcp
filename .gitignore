@@ -59,6 +59,18 @@ Desktop.ini
 .roomodes
 *.md.backup
 
+# AI agent tooling (Claude Flow / Swarm)
+.swarm/
+memory/
+claude-flow
+claude-flow.bat
+claude-flow.ps1
+CLAUDE.md
+
+# Internal development notes (not for distribution)
+ENHANCED_SERVER.md
+IMPROVEMENTS_SUMMARY.md
+
 # Lock files (optional - uncomment if you don't want to commit lock files)
 # package-lock.json
 # yarn.lock
