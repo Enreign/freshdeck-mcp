@@ -110,15 +110,15 @@ export function parseAxiosError(error: AxiosError): FreshdeskError {
     case 404:
       return new NotFoundError('Resource', error.config?.url);
     
-    case 429:
+    case 429: {
       const retryAfter = error.response.headers['retry-after'];
       return new RateLimitError(
         apiError?.message || 'Rate limit exceeded',
         retryAfter ? parseInt(retryAfter, 10) : undefined
       );
-    
+    }
     case 400:
-    case 422:
+    case 422: {
       const validationError = new ValidationError(
         apiError?.message || 'Validation failed'
       );
@@ -129,8 +129,8 @@ export function parseAxiosError(error: AxiosError): FreshdeskError {
         validationError.field = apiError.field;
       }
       return validationError;
-    
-    default:
+    }
+    default: {
       const genericError = new FreshdeskError(
         apiError?.message || `Request failed with status ${status}`,
         apiError?.code || 'API_ERROR',
@@ -140,6 +140,7 @@ export function parseAxiosError(error: AxiosError): FreshdeskError {
         genericError.errors = apiError.errors;
       }
       return genericError;
+    }
   }
 }
 
