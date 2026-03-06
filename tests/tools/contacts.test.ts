@@ -449,9 +449,8 @@ describe('ContactsTool', () => {
 
       expect(mockClient.get).toHaveBeenCalledWith('/search/contacts', {
         params: {
-          query: 'John Doe',
+          query: '"John Doe"',
           page: 1,
-          per_page: 30,
         },
       });
 
@@ -459,7 +458,6 @@ describe('ContactsTool', () => {
       expect(parsed.contacts).toEqual(mockSearchResponse.results);
       expect(parsed.total).toBe(2);
       expect(parsed.page).toBe(1);
-      expect(parsed.per_page).toBe(30);
     });
 
     it('should search contacts with pagination', async () => {
@@ -475,9 +473,8 @@ describe('ContactsTool', () => {
 
       expect(mockClient.get).toHaveBeenCalledWith('/search/contacts', {
         params: {
-          query: 'engineer',
+          query: '"engineer"',
           page: 3,
-          per_page: 10,
         },
       });
     });
@@ -511,7 +508,7 @@ describe('ContactsTool', () => {
     } as Contact;
 
     it('should merge contacts successfully', async () => {
-      mockClient.put.mockResolvedValue(mockMergedContact);
+      mockClient.post.mockResolvedValue(mockMergedContact);
 
       const params = {
         primary_contact_id: 123,
@@ -521,7 +518,8 @@ describe('ContactsTool', () => {
       const result = await contactsTool['mergeContacts'](params);
       const parsed = JSON.parse(result);
 
-      expect(mockClient.put).toHaveBeenCalledWith('/contacts/123/merge', {
+      expect(mockClient.post).toHaveBeenCalledWith('/contacts/merge', {
+        primary_contact_id: 123,
         secondary_contact_ids: [456, 789],
       });
 
@@ -558,7 +556,7 @@ describe('ContactsTool', () => {
     });
 
     it('should handle single contact merge', async () => {
-      mockClient.put.mockResolvedValue(mockMergedContact);
+      mockClient.post.mockResolvedValue(mockMergedContact);
 
       const params = {
         primary_contact_id: 123,
