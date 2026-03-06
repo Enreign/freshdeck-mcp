@@ -8,7 +8,7 @@ import { FreshdeskClient } from '../api/client.js';
 import { FreshdeskConfig } from '../core/types.js';
 import { ToolRegistry } from '../core/registry.js';
 import { PermissionDiscoveryService } from '../auth/permission-discovery.js';
-import { UserPermissions } from '../auth/permissions.js';
+import { UserPermissions, AccessLevel, Permission } from '../auth/permissions.js';
 import { createLogger } from '../utils/logger.js';
 import { EnhancedBaseTool } from '../tools/enhanced-base.js';
 import {
@@ -122,7 +122,6 @@ export class EnhancedFreshdeskServer {
   }
 
   private createDefaultPermissions(): UserPermissions {
-    const { AccessLevel, Permission } = require('../auth/permissions.js');
     return {
       accessLevel: AccessLevel.WRITE,
       isReadOnly: false,
