@@ -151,8 +151,10 @@ export class AgentsTool extends BaseTool {
 
   private async listAgentGroups(params: any): Promise<string> {
     const validated = ListAgentGroupsSchema.parse(params);
-    
-    const groups = await this.client.get<any[]>(`/agents/${validated.agent_id}/groups`);
+
+    const agent = await this.client.get<Agent>(`/agents/${validated.agent_id}`);
+    const groupIds: number[] = (agent as any).group_ids ?? [];
+    const groups = await Promise.all(groupIds.map((id: number) => this.client.get<any>(`/groups/${id}`)));
     return this.formatResponse({
       success: true,
       agent_id: validated.agent_id,
@@ -163,8 +165,10 @@ export class AgentsTool extends BaseTool {
 
   private async listAgentRoles(params: any): Promise<string> {
     const validated = ListAgentRolesSchema.parse(params);
-    
-    const roles = await this.client.get<any[]>(`/agents/${validated.agent_id}/roles`);
+
+    const agent = await this.client.get<Agent>(`/agents/${validated.agent_id}`);
+    const roleIds: number[] = (agent as any).role_ids ?? [];
+    const roles = await Promise.all(roleIds.map((id: number) => this.client.get<any>(`/roles/${id}`)));
     return this.formatResponse({
       success: true,
       agent_id: validated.agent_id,
