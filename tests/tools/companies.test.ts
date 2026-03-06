@@ -238,9 +238,8 @@ describe('CompaniesTool', () => {
 
       expect(mockClient.get).toHaveBeenCalledWith('/search/companies', {
         params: {
-          query: 'tech company',
+          query: '"tech company"',
           page: 1,
-          per_page: 30,
         },
       });
 

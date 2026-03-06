@@ -26,14 +26,12 @@ describe('FreshdeskClient', () => {
   const baseUrl = 'https://test-domain.freshdesk.com/api/v2';
 
   beforeEach(() => {
+    // Use real timers so nock delay and axios timeout work correctly
+    jest.useRealTimers();
+
     // Reset all mocks
     jest.clearAllMocks();
     nock.cleanAll();
-    
-    // Enable nock debugging
-    if (!nock.isActive()) {
-      nock.activate();
-    }
 
     // Setup mock config
     mockConfig = {
@@ -77,9 +75,6 @@ describe('FreshdeskClient', () => {
 
   afterEach(() => {
     nock.cleanAll();
-    if (nock.isActive()) {
-      nock.restore();
-    }
   });
 
   describe('constructor', () => {
@@ -257,7 +252,7 @@ describe('FreshdeskClient', () => {
 
       expect(rateLimitInfo).toEqual({
         remaining: 45,
-        reset: expect.any(Date),
+        resetAt: expect.any(Date),
         limit: 50,
       });
       expect(mockRateLimiter.getRateLimitInfo).toHaveBeenCalled();
