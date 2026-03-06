@@ -491,9 +491,11 @@ describe('FreshdeskClient', () => {
     it('should handle malformed JSON response', async () => {
       nock(baseUrl)
         .get('/test')
-        .reply(200, 'invalid json{', { 'Content-Type': 'application/json' });
+        .reply(200, 'invalid json{');
 
-      await expect(client.get('/test')).rejects.toThrow();
+      // Axios silently ignores JSON parse errors and returns the raw string
+      const result = await client.get('/test');
+      expect(result).toBe('invalid json{');
     });
 
     it('should handle non-axios errors', async () => {
