@@ -37,7 +37,8 @@ export class TicketsAPI extends BaseResource {
     page?: number;
     per_page?: number;
   }): Promise<{ results: Ticket[]; total: number }> {
-    const params = { query, ...options };
+    // Freshdesk Search API requires query wrapped in double quotes
+    const params = { query: `"${query}"`, ...options };
     const queryString = this.buildQueryString(params);
     return this.client.get<{ results: Ticket[]; total: number }>(`/search/tickets${queryString}`);
   }
