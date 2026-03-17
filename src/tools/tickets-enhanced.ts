@@ -192,19 +192,19 @@ export class TicketsEnhancedTool extends EnhancedBaseTool {
         subject: ticket.subject,
       };
       if (ticket.description_text !== undefined) {
-        compact.description_text = ticket.description_text.substring(0, 200);
+        compact['description_text'] = ticket.description_text.substring(0, 200);
       }
-      if (ticket.status !== undefined) compact.status = ticket.status;
-      if (ticket.priority !== undefined) compact.priority = ticket.priority;
-      if (ticket.source !== undefined) compact.source = ticket.source;
-      if (ticket.requester_id !== undefined) compact.requester_id = ticket.requester_id;
-      if (ticket.responder_id !== undefined) compact.responder_id = ticket.responder_id;
-      if (ticket.group_id !== undefined) compact.group_id = ticket.group_id;
-      if (ticket.type !== undefined) compact.type = ticket.type;
-      if (ticket.is_escalated !== undefined) compact.is_escalated = ticket.is_escalated;
-      if (ticket.created_at !== undefined) compact.created_at = ticket.created_at;
-      if (ticket.updated_at !== undefined) compact.updated_at = ticket.updated_at;
-      if (ticket.tags !== undefined) compact.tags = ticket.tags;
+      if (ticket.status !== undefined) compact['status'] = ticket.status;
+      if (ticket.priority !== undefined) compact['priority'] = ticket.priority;
+      if (ticket.source !== undefined) compact['source'] = ticket.source;
+      if (ticket.requester_id !== undefined) compact['requester_id'] = ticket.requester_id;
+      if (ticket.responder_id !== undefined) compact['responder_id'] = ticket.responder_id;
+      if (ticket.group_id !== undefined) compact['group_id'] = ticket.group_id;
+      if (ticket.type !== undefined) compact['type'] = ticket.type;
+      if (ticket.is_escalated !== undefined) compact['is_escalated'] = ticket.is_escalated;
+      if (ticket.created_at !== undefined) compact['created_at'] = ticket.created_at;
+      if (ticket.updated_at !== undefined) compact['updated_at'] = ticket.updated_at;
+      if (ticket.tags !== undefined) compact['tags'] = ticket.tags;
       return compact;
     });
 
