@@ -216,9 +216,28 @@ export class TicketsTool extends BaseTool {
     };
 
     const response = await this.client.get<{ results: Ticket[]; total: number }>('/search/tickets', { params: queryParams });
+
+    // Strip large fields to keep response within MCP token limits
+    const compactTickets = response.results.map((ticket: Ticket) => ({
+      id: ticket.id,
+      subject: ticket.subject,
+      description_text: ticket.description_text?.substring(0, 200) || '',
+      status: ticket.status,
+      priority: ticket.priority,
+      source: ticket.source,
+      requester_id: ticket.requester_id,
+      responder_id: ticket.responder_id,
+      group_id: ticket.group_id,
+      type: ticket.type,
+      is_escalated: ticket.is_escalated,
+      created_at: ticket.created_at,
+      updated_at: ticket.updated_at,
+      tags: ticket.tags,
+    }));
+
     return this.formatResponse({
       success: true,
-      tickets: response.results,
+      tickets: compactTickets,
       total: response.total,
       page: queryParams.page,
     });
