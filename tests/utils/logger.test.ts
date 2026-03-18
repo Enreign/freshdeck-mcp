@@ -20,7 +20,7 @@ const mockLogger = {
 
 const mockPino = jest.fn().mockReturnValue(mockLogger);
 
-jest.mock('pino', () => mockPino);
+jest.mock('pino', () => ({ pino: mockPino }));
 
 describe('Logger', () => {
   beforeEach(() => {
