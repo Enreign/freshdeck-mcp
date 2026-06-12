@@ -294,6 +294,15 @@ export interface ConversationNoteData {
   attachments?: any[];
 }
 
+export interface ConversationForwardData {
+  body: string;
+  to_emails: string[];
+  cc_emails?: string[];
+  bcc_emails?: string[];
+  agent_id?: number;
+  attachments?: any[];
+}
+
 export interface ConversationUpdateData {
   body: string;
 }

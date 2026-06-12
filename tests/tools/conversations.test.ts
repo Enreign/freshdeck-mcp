@@ -40,6 +40,7 @@ describe('ConversationsTool', () => {
     it('should route to correct method based on action', async () => {
       const createReplySpy = jest.spyOn(conversationsTool as any, 'createReply').mockResolvedValue('reply result');
       const createNoteSpy = jest.spyOn(conversationsTool as any, 'createNote').mockResolvedValue('note result');
+      const forwardSpy = jest.spyOn(conversationsTool as any, 'forwardTicket').mockResolvedValue('forward result');
       const listSpy = jest.spyOn(conversationsTool as any, 'listConversations').mockResolvedValue('list result');
       const getSpy = jest.spyOn(conversationsTool as any, 'getConversation').mockResolvedValue('get result');
       const updateSpy = jest.spyOn(conversationsTool as any, 'updateConversation').mockResolvedValue('update result');
@@ -47,6 +48,7 @@ describe('ConversationsTool', () => {
 
       expect(createReplySpy).toBeDefined();
       expect(createNoteSpy).toBeDefined();
+      expect(forwardSpy).toBeDefined();
       expect(listSpy).toBeDefined();
       expect(getSpy).toBeDefined();
       expect(updateSpy).toBeDefined();
@@ -54,6 +56,7 @@ describe('ConversationsTool', () => {
 
       await expect(conversationsTool.execute({ action: 'create_reply', params: {} })).resolves.toBe('reply result');
       await expect(conversationsTool.execute({ action: 'create_note', params: {} })).resolves.toBe('note result');
+      await expect(conversationsTool.execute({ action: 'forward', params: {} })).resolves.toBe('forward result');
       await expect(conversationsTool.execute({ action: 'list', params: {} })).resolves.toBe('list result');
       await expect(conversationsTool.execute({ action: 'get', params: {} })).resolves.toBe('get result');
       await expect(conversationsTool.execute({ action: 'update', params: {} })).resolves.toBe('update result');
@@ -148,6 +151,86 @@ describe('ConversationsTool', () => {
       };
 
       await expect(conversationsTool['createReply'](invalidParams)).rejects.toThrow();
+    });
+  });
+
+  describe('forwardTicket', () => {
+    const mockConversation: Conversation = {
+      id: 321,
+      body: 'Forwarded message',
+      body_text: 'Forwarded message',
+      incoming: false,
+      private: true,
+      user_id: 456,
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z',
+    } as Conversation;
+
+    it('should forward a ticket with valid data', async () => {
+      mockClient.post.mockResolvedValue(mockConversation);
+
+      const params = {
+        ticket_id: 789,
+        body: 'Please review this ticket',
+        to_emails: ['itsupport@example.com'],
+      };
+
+      const result = await conversationsTool['forwardTicket'](params);
+      const parsed = JSON.parse(result);
+
+      expect(mockClient.post).toHaveBeenCalledWith('/tickets/789/forward', {
+        body: 'Please review this ticket',
+        to_emails: ['itsupport@example.com'],
+        cc_emails: undefined,
+        bcc_emails: undefined,
+        agent_id: undefined,
+      });
+
+      expect(parsed.success).toBe(true);
+      expect(parsed.conversation).toEqual(mockConversation);
+      expect(parsed.message).toBe('Ticket #789 forwarded to itsupport@example.com');
+    });
+
+    it('should forward with cc, bcc and agent_id', async () => {
+      mockClient.post.mockResolvedValue(mockConversation);
+
+      const params = {
+        ticket_id: 789,
+        body: 'FYI',
+        to_emails: ['a@example.com', 'b@example.com'],
+        cc_emails: ['cc@example.com'],
+        bcc_emails: ['bcc@example.com'],
+        agent_id: 456,
+      };
+
+      await conversationsTool['forwardTicket'](params);
+
+      expect(mockClient.post).toHaveBeenCalledWith('/tickets/789/forward', {
+        body: 'FYI',
+        to_emails: ['a@example.com', 'b@example.com'],
+        cc_emails: ['cc@example.com'],
+        bcc_emails: ['bcc@example.com'],
+        agent_id: 456,
+      });
+    });
+
+    it('should validate required fields', async () => {
+      const invalidParams = {
+        ticket_id: 789,
+        // Missing body and to_emails
+      };
+
+      await expect(conversationsTool['forwardTicket'](invalidParams)).rejects.toThrow();
+    });
+
+    it('should validate email formats', async () => {
+      const invalidParams = {
+        ticket_id: 789,
+        body: 'Test',
+        to_emails: ['invalid-email'],
+      };
+
+      await expect(conversationsTool['forwardTicket'](invalidParams)).rejects.toThrow();
     });
   });
 
