@@ -21,6 +21,15 @@ const CreateNoteSchema = z.object({
   user_id: z.number().optional().describe('ID of the user creating the note (for agents)'),
 });
 
+const ForwardTicketSchema = z.object({
+  ticket_id: z.number().describe('ID of the ticket to forward'),
+  body: z.string().describe('HTML content of the forward message'),
+  to_emails: z.array(z.string().email()).describe('Email addresses to forward the ticket to'),
+  cc_emails: z.array(z.string().email()).optional().describe('CC email addresses'),
+  bcc_emails: z.array(z.string().email()).optional().describe('BCC email addresses'),
+  agent_id: z.number().optional().describe('ID of the agent forwarding the ticket'),
+});
+
 const ListConversationsSchema = z.object({
   ticket_id: z.number().describe('ID of the ticket to get conversations for'),
   page: z.number().min(1).optional().describe('Page number (default: 1)'),
@@ -51,7 +60,7 @@ export class ConversationsTool extends BaseTool {
         properties: {
           action: {
             type: 'string',
-            enum: ['create_reply', 'create_note', 'list', 'get', 'update', 'delete'],
+            enum: ['create_reply', 'create_note', 'forward', 'list', 'get', 'update', 'delete'],
             description: 'Action to perform on conversations',
           },
           params: {
@@ -73,6 +82,8 @@ export class ConversationsTool extends BaseTool {
           return await this.createReply(params);
         case 'create_note':
           return await this.createNote(params);
+        case 'forward':
+          return await this.forwardTicket(params);
         case 'list':
           return await this.listConversations(params);
         case 'get':
@@ -132,6 +143,29 @@ export class ConversationsTool extends BaseTool {
       success: true,
       conversation,
       message: `Note added to ticket #${validated.ticket_id}`,
+    });
+  }
+
+  private async forwardTicket(params: any): Promise<string> {
+    const validated = ForwardTicketSchema.parse(params);
+
+    const forwardData = {
+      body: validated.body,
+      to_emails: validated.to_emails,
+      cc_emails: validated.cc_emails,
+      bcc_emails: validated.bcc_emails,
+      agent_id: validated.agent_id,
+    };
+
+    const conversation = await this.client.post<Conversation>(
+      `/tickets/${validated.ticket_id}/forward`,
+      forwardData
+    );
+
+    return this.formatResponse({
+      success: true,
+      conversation,
+      message: `Ticket #${validated.ticket_id} forwarded to ${validated.to_emails.join(', ')}`,
     });
   }
 

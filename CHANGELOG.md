@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Features
+
+#### `conversations_manage`
+- **`forward`**: New action to forward a ticket to other recipients via `POST /tickets/:id/forward`. Accepts `body` and `to_emails` (required), plus optional `cc_emails`, `bcc_emails` and `agent_id`.
+
 ### Bug Fixes
 
 #### `agents_manage`

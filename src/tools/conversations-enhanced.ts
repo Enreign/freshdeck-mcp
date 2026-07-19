@@ -4,7 +4,7 @@ import { FreshdeskClient } from '../api/client.js';
 import { Permission, AccessLevel } from '../auth/permissions.js';
 
 const ConversationsManageSchema = z.object({
-  action: z.enum(['list', 'create_reply', 'create_note', 'update', 'delete']).describe('Action to perform on conversations'),
+  action: z.enum(['list', 'create_reply', 'create_note', 'forward', 'update', 'delete']).describe('Action to perform on conversations'),
   params: z.object({
     // Common params
     ticket_id: z.number().describe('ID of the ticket').optional(),
@@ -23,6 +23,9 @@ const ConversationsManageSchema = z.object({
     // Create note params
     private: z.boolean().describe('Whether the note is private (default: true)').optional(),
     notify_emails: z.array(z.string().email()).describe('Email addresses to notify about the note').optional(),
+
+    // Forward params
+    agent_id: z.number().describe('ID of the agent forwarding the ticket').optional(),
     
     // Update specific
     conversation_id: z.number().describe('ID of the conversation to update').optional(),
@@ -63,6 +66,8 @@ export class ConversationsEnhancedTool extends EnhancedBaseTool {
           return await this.createReply(params);
         case 'create_note':
           return await this.createNote(params);
+        case 'forward':
+          return await this.forwardTicket(params);
         case 'update':
           return await this.updateConversation(params);
         case 'delete':
@@ -142,6 +147,37 @@ export class ConversationsEnhancedTool extends EnhancedBaseTool {
     const response = await this.client.conversations.createNote(ticket_id, noteData);
     return this.formatResponse({
       message: 'Note created successfully',
+      conversation: response,
+    });
+  }
+
+  private async forwardTicket(params: any): Promise<string> {
+    const { ticket_id, body, to_emails, cc_emails, bcc_emails, agent_id, attachments } = params;
+
+    if (!ticket_id) {
+      throw new Error('ticket_id is required for forward action');
+    }
+
+    if (!body) {
+      throw new Error('body is required for forward action');
+    }
+
+    if (!to_emails || to_emails.length === 0) {
+      throw new Error('to_emails is required for forward action');
+    }
+
+    const forwardData = {
+      body,
+      to_emails,
+      cc_emails,
+      bcc_emails,
+      agent_id,
+      attachments,
+    };
+
+    const response = await this.client.conversations.forward(ticket_id, forwardData);
+    return this.formatResponse({
+      message: 'Ticket forwarded successfully',
       conversation: response,
     });
   }

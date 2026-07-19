@@ -1,5 +1,5 @@
 import { BaseResource } from './base.js';
-import { Conversation, ConversationReplyData, ConversationNoteData, ConversationUpdateData } from '../../core/types.js';
+import { Conversation, ConversationReplyData, ConversationNoteData, ConversationForwardData, ConversationUpdateData } from '../../core/types.js';
 
 export class ConversationsAPI extends BaseResource {
   async list(ticketId: number, options?: {
@@ -16,6 +16,10 @@ export class ConversationsAPI extends BaseResource {
 
   async createNote(ticketId: number, data: ConversationNoteData): Promise<Conversation> {
     return this.client.post<Conversation>(`/tickets/${ticketId}/notes`, data);
+  }
+
+  async forward(ticketId: number, data: ConversationForwardData): Promise<Conversation> {
+    return this.client.post<Conversation>(`/tickets/${ticketId}/forward`, data);
   }
 
   async update(ticketId: number, conversationId: number, data: ConversationUpdateData): Promise<Conversation> {

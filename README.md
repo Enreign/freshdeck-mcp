@@ -117,11 +117,12 @@ Manage Freshdesk companies - create, update, list, get, delete, search companies
 - `list_contacts`: List contacts in a company
 
 ### 5. conversations_manage
-Manage Freshdesk ticket conversations - create replies and notes, list, get, update, and delete conversations.
+Manage Freshdesk ticket conversations - create replies and notes, forward, list, get, update, and delete conversations.
 
 **Actions:**
 - `create_reply`: Add a reply to a ticket
 - `create_note`: Add a note to a ticket
+- `forward`: Forward a ticket to other email addresses (`to_emails`, optional `cc_emails`/`bcc_emails`/`agent_id`)
 - `list`: List ticket conversations
 - `get`: Get a specific conversation
 - `update`: Update a conversation
