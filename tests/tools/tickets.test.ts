@@ -40,7 +40,7 @@ describe('TicketsTool', () => {
       const actionProperty = definition.inputSchema.properties?.['action'];
 
       expect((actionProperty as any).enum).toEqual([
-        'create', 'update', 'list', 'get', 'delete', 'search'
+        'create', 'update', 'list', 'get', 'delete', 'search', 'send_outbound_email'
       ]);
     });
   });
@@ -53,6 +53,7 @@ describe('TicketsTool', () => {
       const getSpy = jest.spyOn(ticketsTool as any, 'getTicket').mockResolvedValue('get result');
       const deleteSpy = jest.spyOn(ticketsTool as any, 'deleteTicket').mockResolvedValue('delete result');
       const searchSpy = jest.spyOn(ticketsTool as any, 'searchTickets').mockResolvedValue('search result');
+      const sendOutboundSpy = jest.spyOn(ticketsTool as any, 'sendOutboundEmail').mockResolvedValue('send_outbound_email result');
 
       await expect(ticketsTool.execute({ action: 'create', params: {} })).resolves.toBe('create result');
       await expect(ticketsTool.execute({ action: 'update', params: {} })).resolves.toBe('update result');
@@ -60,6 +61,7 @@ describe('TicketsTool', () => {
       await expect(ticketsTool.execute({ action: 'get', params: {} })).resolves.toBe('get result');
       await expect(ticketsTool.execute({ action: 'delete', params: {} })).resolves.toBe('delete result');
       await expect(ticketsTool.execute({ action: 'search', params: {} })).resolves.toBe('search result');
+      await expect(ticketsTool.execute({ action: 'send_outbound_email', params: {} })).resolves.toBe('send_outbound_email result');
 
       expect(createSpy).toHaveBeenCalledWith({});
       expect(updateSpy).toHaveBeenCalledWith({});
@@ -67,6 +69,7 @@ describe('TicketsTool', () => {
       expect(getSpy).toHaveBeenCalledWith({});
       expect(deleteSpy).toHaveBeenCalledWith({});
       expect(searchSpy).toHaveBeenCalledWith({});
+      expect(sendOutboundSpy).toHaveBeenCalledWith({});
     });
 
     it('should handle unknown action', async () => {
