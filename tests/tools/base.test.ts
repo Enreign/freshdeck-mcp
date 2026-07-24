@@ -418,6 +418,124 @@ describe('BaseTool', () => {
         code: 'STANDARD_ERROR',
       });
     });
+
+    it('should surface errors array when present (e.g. Freshdesk validation errors)', () => {
+      const error = {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        errors: [
+          { field: 'custom_fields.cf_brand', message: "It should be one of these values: 'Dandomain,ScanNet,Curanet,Wannafind,Onpay,team.blue'", code: 'missing_field' },
+        ],
+      };
+
+      const formatted = testTool['handleError'](error);
+      const parsed = JSON.parse(formatted);
+
+      expect(parsed).toEqual({
+        error: true,
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        errors: [
+          { field: 'custom_fields.cf_brand', message: "It should be one of these values: 'Dandomain,ScanNet,Curanet,Wannafind,Onpay,team.blue'", code: 'missing_field' },
+        ],
+      });
+    });
+
+    it('should surface multiple errors when present', () => {
+      const error = {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        errors: [
+          { field: 'email', message: 'Invalid email', code: 'invalid' },
+          { field: 'subject', message: 'Subject is required', code: 'missing_field' },
+        ],
+      };
+
+      const parsed = JSON.parse(testTool['handleError'](error));
+
+      expect(parsed.errors).toEqual([
+        { field: 'email', message: 'Invalid email', code: 'invalid' },
+        { field: 'subject', message: 'Subject is required', code: 'missing_field' },
+      ]);
+    });
+
+    it('should surface field when present', () => {
+      const error = {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        field: 'email',
+      };
+
+      const parsed = JSON.parse(testTool['handleError'](error));
+
+      expect(parsed).toEqual({
+        error: true,
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        field: 'email',
+      });
+    });
+
+    it('should surface statusCode when present', () => {
+      const error = {
+        message: 'Not found',
+        code: 'NOT_FOUND',
+        statusCode: 404,
+      };
+
+      const parsed = JSON.parse(testTool['handleError'](error));
+
+      expect(parsed).toEqual({
+        error: true,
+        message: 'Not found',
+        code: 'NOT_FOUND',
+        statusCode: 404,
+      });
+    });
+
+    it('should not include errors when array is empty', () => {
+      const error = {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        errors: [],
+      };
+
+      const parsed = JSON.parse(testTool['handleError'](error));
+
+      expect(parsed).toEqual({
+        error: true,
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+      });
+      expect(parsed.errors).toBeUndefined();
+    });
+
+    it('should not include field when empty string', () => {
+      const error = {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        field: '',
+      };
+
+      const parsed = JSON.parse(testTool['handleError'](error));
+
+      expect(parsed.field).toBeUndefined();
+    });
+
+    it('should normalize non-object error entries in errors array', () => {
+      const error = {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        errors: ['plain string error', { field: 'subject', message: 'required', code: 'missing_field' }],
+      };
+
+      const parsed = JSON.parse(testTool['handleError'](error));
+
+      expect(parsed.errors).toEqual([
+        'plain string error',
+        { field: 'subject', message: 'required', code: 'missing_field' },
+      ]);
+    });
   });
 
   describe('execute method', () => {

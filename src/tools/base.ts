@@ -92,11 +92,34 @@ export abstract class BaseTool {
 
   protected handleError(error: any): string {
     if (error && error.message) {
-      return JSON.stringify({
+      const result: Record<string, unknown> = {
         error: true,
         message: error.message,
         code: error.code || 'UNKNOWN_ERROR',
-      });
+      };
+
+      if (Array.isArray(error.errors) && error.errors.length > 0) {
+        result['errors'] = error.errors.map((e: any) => {
+          if (e && typeof e === 'object') {
+            const clean: Record<string, unknown> = {};
+            if (e.field !== undefined) clean['field'] = e.field;
+            if (e.message !== undefined) clean['message'] = e.message;
+            if (e.code !== undefined) clean['code'] = e.code;
+            return clean;
+          }
+          return e;
+        });
+      }
+
+      if (error.field !== undefined && error.field !== null && error.field !== '') {
+        result['field'] = error.field;
+      }
+
+      if (error.statusCode !== undefined) {
+        result['statusCode'] = error.statusCode;
+      }
+
+      return JSON.stringify(result);
     }
     return JSON.stringify({
       error: true,
