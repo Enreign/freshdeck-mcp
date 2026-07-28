@@ -33,6 +33,23 @@ const UpdateTicketSchema = z.object({
   product_id: z.number().optional().describe('Product ID associated with the ticket'),
 });
 
+const SendOutboundEmailSchema = z.object({
+  subject: z.string().describe('Subject of the outbound email'),
+  description: z.string().describe('HTML body of the outbound email'),
+  email: z.string().email().describe('Email address of the recipient'),
+  priority: z.number().min(1).max(4).optional().describe('Priority: 1=Low, 2=Medium, 3=High, 4=Urgent (default: 1)'),
+  status: z.number().min(2).max(7).optional().describe('Status: 2=Open, 3=Pending, 4=Resolved, 5=Closed, 6=Waiting on Customer, 7=Waiting on Third Party (default: 2)'),
+  tags: z.array(z.string()).optional().describe('Tags for the ticket'),
+  cc_emails: z.array(z.string().email()).optional().describe('Email addresses to CC'),
+  bcc_emails: z.array(z.string().email()).optional().describe('Email addresses to BCC'),
+  custom_fields: z.record(z.any()).optional().describe('Custom fields as key-value pairs'),
+  group_id: z.number().optional().describe('Group ID to assign the ticket'),
+  responder_id: z.number().optional().describe('Agent ID to assign the ticket'),
+  type: z.string().optional().describe('Ticket type'),
+  product_id: z.number().optional().describe('Product ID associated with the ticket'),
+  email_config_id: z.number().optional().describe('Email config ID (support email address to send from)'),
+});
+
 const ListTicketsSchema = z.object({
   page: z.number().min(1).optional().describe('Page number (default: 1)'),
   per_page: z.number().min(1).max(100).optional().describe('Items per page (default: 30, max: 100)'),
@@ -62,13 +79,13 @@ export class TicketsTool extends BaseTool {
   get definition(): Tool {
     return {
       name: 'tickets_manage',
-      description: 'Manage Freshdesk tickets - create, update, list, get, delete, and search tickets',
+      description: 'Manage Freshdesk tickets - create, update, list, get, delete, search, and send outbound emails',
       inputSchema: {
         type: 'object',
         properties: {
           action: {
             type: 'string',
-            enum: ['create', 'update', 'list', 'get', 'delete', 'search'],
+            enum: ['create', 'update', 'list', 'get', 'delete', 'search', 'send_outbound_email'],
             description: 'Action to perform on tickets',
           },
           params: {
@@ -98,6 +115,8 @@ export class TicketsTool extends BaseTool {
           return await this.deleteTicket(params);
         case 'search':
           return await this.searchTickets(params);
+        case 'send_outbound_email':
+          return await this.sendOutboundEmail(params);
         default:
           throw new Error(`Unknown action: ${action}`);
       }
@@ -130,6 +149,34 @@ export class TicketsTool extends BaseTool {
       success: true,
       ticket,
       message: `Ticket #${ticket.id} created successfully`,
+    });
+  }
+
+  private async sendOutboundEmail(params: any): Promise<string> {
+    const validated = SendOutboundEmailSchema.parse(params);
+
+    const emailData = {
+      subject: validated.subject,
+      description: validated.description,
+      email: validated.email,
+      priority: validated.priority as Priority,
+      status: validated.status as Status,
+      tags: validated.tags,
+      cc_emails: validated.cc_emails,
+      bcc_emails: validated.bcc_emails,
+      custom_fields: validated.custom_fields,
+      group_id: validated.group_id,
+      responder_id: validated.responder_id,
+      type: validated.type,
+      product_id: validated.product_id,
+      email_config_id: validated.email_config_id,
+    };
+
+    const ticket = await this.client.post<Ticket>('/tickets/outbound_email', emailData);
+    return this.formatResponse({
+      success: true,
+      ticket,
+      message: `Outbound email sent — Ticket #${ticket.id} created`,
     });
   }
 

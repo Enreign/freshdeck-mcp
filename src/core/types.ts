@@ -203,6 +203,23 @@ export interface TicketUpdateData {
   product_id?: number;
 }
 
+export interface OutboundEmailData {
+  subject: string;
+  description: string;
+  email: string;
+  priority?: Priority;
+  status?: Status;
+  tags?: string[];
+  cc_emails?: string[];
+  bcc_emails?: string[];
+  custom_fields?: Record<string, any>;
+  group_id?: number;
+  responder_id?: number;
+  type?: string;
+  product_id?: number;
+  email_config_id?: number;
+}
+
 export interface ContactCreateData {
   name: string;
   email: string;

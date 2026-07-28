@@ -1,9 +1,13 @@
 import { BaseResource } from './base.js';
-import { Ticket, TicketCreateData, TicketUpdateData } from '../../core/types.js';
+import { Ticket, TicketCreateData, TicketUpdateData, OutboundEmailData } from '../../core/types.js';
 
 export class TicketsAPI extends BaseResource {
   async create(data: TicketCreateData): Promise<Ticket> {
     return this.client.post<Ticket>('/tickets', data);
+  }
+
+  async sendOutboundEmail(data: OutboundEmailData): Promise<Ticket> {
+    return this.client.post<Ticket>('/tickets/outbound_email', data);
   }
 
   async update(ticketId: number, data: TicketUpdateData): Promise<Ticket> {
